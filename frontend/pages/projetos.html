@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Projetos</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+<div class="sidebar">
+
+<div class="logo">
+EcoBuild
+</div>
+
+<div class="sidebar">
+
+<div class="logo">
+EcoBuild
+</div>
+
+<a href="dashboard.html">
+🏠 Dashboard
+</a>
+
+<a href="projetos.html">
+📁 Projetos
+</a>
+
+<a href="calculadora.html">
+🧱 Calculadora
+</a>
+
+<a href="historico.html">
+📋 Histórico
+</a>
+
+<a href="http://localhost:3000/relatorios/pdf" target="_blank">
+📄 Relatório PDF
+</a>
+
+<a href="#" onclick="logout()">
+🚪 Sair
+</a>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<h1>Projetos</h1>
+
+<br>
+
+<div class="card">
+
+<input
+id="nome"
+placeholder="Nome do Projeto"
+>
+
+<textarea
+id="descricao"
+placeholder="Descrição"
+></textarea>
+
+<button onclick="salvarProjeto()">
+Salvar Projeto
+</button>
+
+</div>
+
+<br>
+
+<div id="listaProjetos"></div>
+
+</div>
+
+</div>
+
+<script src="../js/projetos.js"></script>
+<script src="../js/logout.js"></script>
+</body>
+</html>
