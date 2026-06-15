@@ -11,6 +11,6 @@ Funcionalidades planejadas:
 - Cálculo de tijolos e argamassa
 
 Instalação:
-cd backend
-npm install express sqlite3 cors bcrypt jsonwebtoken pdfkit
-node server.js
+- cd backend
+- npm install express sqlite3 cors bcrypt jsonwebtoken pdfkit
+- node server.js
