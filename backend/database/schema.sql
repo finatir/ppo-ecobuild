@@ -103,7 +103,7 @@ INSERT OR IGNORE INTO tijolos (
     id,
     tipo,
     comprimento,
-    largura,np
+    largura,
     altura
 )
 VALUES
