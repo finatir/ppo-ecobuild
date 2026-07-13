@@ -1,5 +1,6 @@
 # Dependências Node.js
 node_modules/
+backend/node_modules/
 
 # Banco de dados SQLite
 database/*.db
@@ -18,3 +19,6 @@ build/
 
 # Variáveis de ambiente
 .env
+
+frontend/node_modules/
+database/
