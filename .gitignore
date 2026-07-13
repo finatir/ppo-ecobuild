@@ -1,0 +1,19 @@
+# Dependências Node.js
+node_modules/
+
+# Banco de dados SQLite
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Arquivos temporários
+dist/
+build/
+
+# Variáveis de ambiente
+.env

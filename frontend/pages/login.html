@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login - EcoBuild</title>
+
+<link rel="stylesheet" href="../css/style.css">
+
+<style>
+
+body{
+    background:linear-gradient(
+        135deg,
+        #166534,
+        #22c55e
+    );
+}
+
+.login-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.login-card{
+
+    width:420px;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:20px;
+
+    box-shadow:
+    0 10px 30px rgba(
+        0,0,0,.2
+    );
+
+}
+
+.logo-login{
+
+    text-align:center;
+
+    font-size:36px;
+
+    font-weight:bold;
+
+    color:#166534;
+
+    margin-bottom:10px;
+
+}
+
+.subtitulo{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-bottom:30px;
+
+}
+
+.input-group{
+
+    margin-bottom:20px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.login-btn{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#16a34a;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+}
+
+.login-btn:hover{
+
+    background:#15803d;
+
+}
+
+.cadastro-link{
+
+    text-align:center;
+
+    margin-top:20px;
+
+}
+
+.cadastro-link a{
+
+    color:#16a34a;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<div class="login-card">
+
+<div class="logo-login">
+🏗️ EcoBuild
+</div>
+
+<div class="subtitulo">
+Sistema de cálculo de materiais para construção
+</div>
+
+<div class="input-group">
+
+<label>Email</label>
+
+<input
+type="email"
+id="email"
+placeholder="Digite seu email"
+>
+
+</div>
+
+<div class="input-group">
+
+<label>Senha</label>
+
+<input
+type="password"
+id="senha"
+placeholder="Digite sua senha"
+>
+
+</div>
+
+<button
+class="login-btn"
+onclick="login()"
+>
+Entrar
+</button>
+
+<div class="cadastro-link">
+
+Não possui conta?
+
+<a href="cadastro.html">
+Cadastre-se
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="../js/login.js"></script>
+
+</body>
+</html>
