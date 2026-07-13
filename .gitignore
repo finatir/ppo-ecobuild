@@ -2,6 +2,7 @@
 node_modules/
 
 # Banco de dados SQLite
+database/*.db
 *.db
 *.sqlite
 

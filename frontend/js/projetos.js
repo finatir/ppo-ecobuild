@@ -1,96 +1,109 @@
-const token =
-localStorage.getItem(
-"token"
-);
-
-async function salvarProjeto(){
-
- const nome =
- document.getElementById(
- "nome"
- ).value;
-
- const descricao =
- document.getElementById(
- "descricao"
- ).value;
-
- await fetch(
- "http://localhost:3000/projetos",
- {
-   method:"POST",
-   headers:{
-     "Content-Type":
-     "application/json",
-
-     Authorization:
-     `Bearer ${token}`
-   },
-
-   body:JSON.stringify({
-      nome,
-      descricao
-   })
- }
- );
-
- carregarProjetos();
-
-}
+const API = "http://localhost:3000";
 
 async function carregarProjetos(){
 
- const response =
- await fetch(
- "http://localhost:3000/projetos",
- {
-   headers:{
-     Authorization:
-     `Bearer ${token}`
-   }
- }
- );
+    const resposta = await fetch(`${API}/projetos`,{
 
- const projetos =
- await response.json();
+        credentials:"include"
 
- const lista =
- document.getElementById(
- "listaProjetos"
- );
+    });
 
- lista.innerHTML = "";
+    const projetos = await resposta.json();
 
- projetos.forEach(p=>{
+    const lista = document.getElementById("listaProjetos");
 
-   lista.innerHTML += `
-   <div class="projeto-card">
+    lista.innerHTML = "";
 
-      <h2>${p.nome}</h2>
+    projetos.forEach(projeto=>{
 
-      <p>${p.descricao}</p>
+        lista.innerHTML += `
 
-      <br>
+            <div class="projeto-card">
 
-      <button
-      onclick="abrirProjeto(${p.id})">
-      Abrir Projeto
-      </button>
+                <h2>${projeto.nome_projeto}</h2>
 
-   </div>
-   `;
+                <p>Tijolo: ${projeto.tipo}</p>
 
- }
-);
-function abrirProjeto(id){
+                <p>Área: ${projeto.area_parede} m²</p>
 
- localStorage.setItem(
-   "projetoAtual",
-   id
- );
+                <button onclick="removerProjeto(${projeto.id})">
 
- window.location.href =
- "calculadora.html";
+                    Excluir
+
+                </button>
+
+            </div>
+
+        `;
+
+    });
 
 }
+
+async function cadastrarProjeto(){
+
+    const nome_projeto =
+
+        document.getElementById("nomeProjeto").value;
+
+    const tijolo_id =
+
+        document.getElementById("tijolo").value;
+
+    const area_parede =
+
+        document.getElementById("area").value;
+
+    const espessura_junta =
+
+        document.getElementById("junta").value;
+
+    const resposta = await fetch(`${API}/projetos`,{
+
+        method:"POST",
+
+        credentials:"include",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify({
+
+            nome_projeto,
+
+            tijolo_id,
+
+            area_parede,
+
+            espessura_junta
+
+        })
+
+    });
+
+    if(resposta.ok){
+
+        carregarProjetos();
+
+    }
+
 }
+
+async function removerProjeto(id){
+
+    await fetch(`${API}/projetos/${id}`,{
+
+        method:"DELETE",
+
+        credentials:"include"
+
+    });
+
+    carregarProjetos();
+
+}
+
+carregarProjetos();

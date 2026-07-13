@@ -2,98 +2,183 @@ const express = require("express");
 
 const db = require("../database");
 
-const auth =
-require("../middleware/authMiddleware");
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/", auth, (req,res)=>{
+/* REALIZAR CÁLCULO */
 
-  const {
-    projeto_id,
-    area,
-    altura,
-    largura,
-    comprimento
-  } = req.body;
+router.post("/", auth, (req, res) => {
 
-  const areaTijolo =
-  (altura/100) *
-  (comprimento/100);
+    const {
 
-  const quantidade =
-  Math.ceil(area / areaTijolo);
+        projeto_id,
 
-  const volumeArgamassa =
-  area * 0.02;
+        modelo_id
 
-  const sacosCimento =
-  Math.ceil(volumeArgamassa * 7);
+    } = req.body;
 
-  db.run(
-    `
-    INSERT INTO calculos(
-      projeto_id,
-      area,
-      altura,
-      largura,
-      comprimento,
-      quantidade_tijolos,
-      volume_argamassa,
-      sacos_cimento
-    )
-    VALUES(?,?,?,?,?,?,?,?)
-    `,
-    [
-      projeto_id,
-      area,
-      altura,
-      largura,
-      comprimento,
-      quantidade,
-      volumeArgamassa,
-      sacosCimento
-    ],
-    function(err){
+    db.get(
 
-      if(err){
+        `
+        SELECT
+            projetos.area_parede,
+            projetos.espessura_junta,
+            tijolos.comprimento,
+            tijolos.altura
 
-        return res
-        .status(500)
-        .json(err);
+        FROM projetos
 
-      }
+        INNER JOIN tijolos
 
-      res.json({
-        quantidade,
-        volumeArgamassa,
-        sacosCimento
-      });
+        ON projetos.tijolo_id=tijolos.id
 
-    }
-  );
+        WHERE projetos.id=?
+        `,
+
+        [
+
+            projeto_id
+
+        ],
+
+        (err, projeto) => {
+
+            if (err) {
+
+                return res.status(500).json({
+
+                    erro: err.message
+
+                });
+
+            }
+
+            if (!projeto) {
+
+                return res.status(404).json({
+
+                    erro: "Projeto não encontrado."
+
+                });
+
+            }
+
+            const areaTijolo =
+                (projeto.comprimento / 100) *
+                (projeto.altura / 100);
+
+            const qtd_tijolos =
+                Math.ceil(projeto.area_parede / areaTijolo);
+
+            const volume_argamassa =
+                Number((projeto.area_parede * 0.02).toFixed(2));
+
+            db.run(
+
+                `
+                INSERT INTO calculos(
+
+                    projeto_id,
+                    modelo_id,
+                    qtd_tijolos,
+                    volume_argamassa,
+                    area_total
+
+                )
+
+                VALUES(?,?,?,?,?)
+                `,
+
+                [
+
+                    projeto_id,
+
+                    modelo_id,
+
+                    qtd_tijolos,
+
+                    volume_argamassa,
+
+                    projeto.area_parede
+
+                ],
+
+                function(err){
+
+                    if(err){
+
+                        return res.status(500).json({
+
+                            erro:err.message
+
+                        });
+
+                    }
+
+                    res.json({
+
+                        id:this.lastID,
+
+                        qtd_tijolos,
+
+                        volume_argamassa,
+
+                        area_total:projeto.area_parede
+
+                    });
+
+                }
+
+            );
+
+        }
+
+    );
 
 });
 
-router.get(
-"/historico/:projetoId",
-auth,
-(req,res)=>{
+/* HISTÓRICO */
 
-  db.all(
-    `
-    SELECT *
-    FROM calculos
-    WHERE projeto_id = ?
-    ORDER BY id DESC
-    `,
-    [req.params.projetoId],
-    (err,rows)=>{
+router.get("/", auth, (req,res)=>{
 
-      res.json(rows);
+    db.all(
 
-    }
-  );
+        `
+        SELECT
+
+            calculos.*,
+
+            projetos.nome_projeto
+
+        FROM calculos
+
+        INNER JOIN projetos
+
+        ON calculos.projeto_id=projetos.id
+
+        ORDER BY data_calculo DESC
+        `,
+
+        [],
+
+        (err,rows)=>{
+
+            if(err){
+
+                return res.status(500).json({
+
+                    erro:err.message
+
+                });
+
+            }
+
+            res.json(rows);
+
+        }
+
+    );
 
 });
 

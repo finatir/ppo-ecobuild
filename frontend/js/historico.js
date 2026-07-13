@@ -1,65 +1,38 @@
-const token =
-localStorage.getItem("token");
-
-const projetoAtual =
-localStorage.getItem(
-"projetoAtual"
-);
+const API = "http://localhost:3000";
 
 async function carregarHistorico(){
 
- const response =
- await fetch(
- `http://localhost:3000/calculos/historico/${projetoAtual}`,
- {
-   headers:{
-     Authorization:
-     `Bearer ${token}`
-   }
- }
- );
+    const resposta = await fetch(`${API}/calculos`,{
 
- const historico =
- await response.json();
+        credentials:"include"
 
- let html = `
- <tr>
- <th>Data</th>
- <th>Tijolos</th>
- <th>Argamassa</th>
- <th>Cimento</th>
- </tr>
- `;
+    });
 
- historico.forEach(c=>{
+    const historico = await resposta.json();
 
-   html += `
-   <tr>
+    const tabela = document.getElementById("historico");
 
-   <td>
-   ${c.data_calculo}
-   </td>
+    tabela.innerHTML = "";
 
-   <td>
-   ${c.quantidade_tijolos}
-   </td>
+    historico.forEach(item=>{
 
-   <td>
-   ${c.volume_argamassa}
-   </td>
+        tabela.innerHTML += `
 
-   <td>
-   ${c.sacos_cimento}
-   </td>
+        <tr>
 
-   </tr>
-   `;
+            <td>${item.nome_projeto}</td>
 
- });
+            <td>${item.qtd_tijolos}</td>
 
- document.getElementById(
- "tabelaHistorico"
- ).innerHTML = html;
+            <td>${item.volume_argamassa}</td>
+
+            <td>${item.data_calculo}</td>
+
+        </tr>
+
+        `;
+
+    });
 
 }
 

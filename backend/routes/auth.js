@@ -1,100 +1,142 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const db = require("../database");
 
 const router = express.Router();
 
-router.post("/cadastro", async (req, res) => {
+router.post("/cadastro", async (req,res)=>{
 
-  const { nome, email, senha } = req.body;
+    const {nome,email,senha}=req.body;
 
-  const senhaHash = await bcrypt.hash(
-    senha,
-    10
-  );
+    const hash=await bcrypt.hash(senha,10);
 
-  db.run(
-    `
-    INSERT INTO usuarios(
-      nome,
-      email,
-      senha
-    )
-    VALUES(?,?,?)
-    `,
-    [nome, email, senhaHash],
-    function(err){
+    db.run(
 
-      if(err){
+        `INSERT INTO usuarios(nome,email,senha)
+        VALUES(?,?,?)`,
 
-        return res.status(400).json({
-          erro:"Email já cadastrado"
-        });
+        [nome,email,hash],
 
-      }
+        function(err){
 
-      res.json({
-        mensagem:"Usuário criado"
-      });
+            if(err){
 
-    }
-  );
+                return res.status(400).json({
+
+                    erro:"Email já cadastrado"
+
+                });
+
+            }
+
+            res.json({
+
+                mensagem:"Usuário criado"
+
+            });
+
+        }
+
+    );
 
 });
 
 router.post("/login",(req,res)=>{
 
-  const { email, senha } = req.body;
+    const {email,senha}=req.body;
 
-  db.get(
-    `
-    SELECT *
-    FROM usuarios
-    WHERE email = ?
-    `,
-    [email],
-    async (err, usuario)=>{
+    db.get(
 
-      if(!usuario){
+        `SELECT * FROM usuarios
+        WHERE email=?`,
 
-        return res.status(404).json({
-          erro:"Usuário não encontrado"
-        });
+        [email],
 
-      }
+        async(err,usuario)=>{
 
-      const senhaValida =
-      await bcrypt.compare(
-        senha,
-        usuario.senha
-      );
+            if(!usuario){
 
-      if(!senhaValida){
+                return res.status(404).json({
 
-        return res.status(401).json({
-          erro:"Senha inválida"
-        });
+                    erro:"Usuário não encontrado"
 
-      }
+                });
 
-      const token = jwt.sign(
-        {
-          id:usuario.id,
-          email:usuario.email
-        },
-        "SEGREDO_ECOBUILD",
-        {
-          expiresIn:"1d"
+            }
+
+            const valida=
+
+            await bcrypt.compare(
+
+                senha,
+
+                usuario.senha
+
+            );
+
+            if(!valida){
+
+                return res.status(401).json({
+
+                    erro:"Senha inválida"
+
+                });
+
+            }
+
+            req.session.usuario={
+
+                id:usuario.id,
+
+                nome:usuario.nome,
+
+                email:usuario.email
+
+            };
+
+            res.json({
+
+                mensagem:"Login realizado",
+
+                usuario:req.session.usuario
+
+            });
+
         }
-      );
 
-      res.json({ token });
-
-    }
-  );
+    );
 
 });
 
-module.exports = router;
+router.get("/me",(req,res)=>{
+
+    if(!req.session.usuario){
+
+        return res.status(401).json({
+
+            erro:"Não autenticado"
+
+        });
+
+    }
+
+    res.json(req.session.usuario);
+
+});
+
+router.post("/logout",(req,res)=>{
+
+    req.session.destroy(()=>{
+
+        res.json({
+
+            mensagem:"Logout realizado"
+
+        });
+
+    });
+
+});
+
+module.exports=router;

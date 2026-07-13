@@ -1,44 +1,63 @@
-async function cadastrar(){
+const API = "http://localhost:3000";
 
-    const nome =
-    document.getElementById(
-        "nome"
-    ).value;
+const form = document.getElementById("formCadastro");
 
-    const email =
-    document.getElementById(
-        "email"
-    ).value;
+form.addEventListener("submit", async (e) => {
 
-    const senha =
-    document.getElementById(
-        "senha"
-    ).value;
+    e.preventDefault();
 
-    const response =
-    await fetch(
-        "http://localhost:3000/auth/cadastro",
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":
-                "application/json"
+    const nome = document.getElementById("nome").value;
+
+    const email = document.getElementById("email").value;
+
+    const senha = document.getElementById("senha").value;
+
+    try {
+
+        const resposta = await fetch(`${API}/auth/cadastro`, {
+
+            method: "POST",
+
+            credentials: "include",
+
+            headers: {
+
+                "Content-Type": "application/json"
+
             },
-            body:JSON.stringify({
+
+            body: JSON.stringify({
+
                 nome,
+
                 email,
+
                 senha
+
             })
+
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+
+            alert(dados.erro);
+
+            return;
+
         }
-    );
 
-    const dados =
-    await response.json();
+        alert("Cadastro realizado com sucesso!");
 
-    alert(
-        dados.mensagem
-    );
+        window.location.href = "login.html";
 
-    window.location.href =
-    "login.html";
-}
+    }
+
+    catch (erro) {
+
+        console.log(erro);
+
+    }
+
+});

@@ -1,73 +1,59 @@
-async function login(){
+const API = "http://localhost:3000";
 
-    const email =
-    document.getElementById(
-        "email"
-    ).value;
+const form = document.getElementById("formLogin");
 
-    const senha =
-    document.getElementById(
-        "senha"
-    ).value;
+form.addEventListener("submit", async (e) => {
 
-    if(!email || !senha){
+    e.preventDefault();
 
-        alert(
-            "Preencha todos os campos."
-        );
+    const email = document.getElementById("email").value;
 
-        return;
+    const senha = document.getElementById("senha").value;
 
-    }
+    try {
 
-    try{
+        const resposta = await fetch(`${API}/auth/login`, {
 
-        const response =
-        await fetch(
-            "http://localhost:3000/auth/login",
-            {
-                method:"POST",
+            method: "POST",
 
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
+            credentials: "include",
 
-                body:JSON.stringify({
-                    email,
-                    senha
-                })
-            }
-        );
+            headers: {
 
-        const dados =
-        await response.json();
+                "Content-Type": "application/json"
 
-        if(dados.token){
+            },
 
-            localStorage.setItem(
-                "token",
-                dados.token
-            );
+            body: JSON.stringify({
 
-            window.location.href =
-            "dashboard.html";
+                email,
 
-        }else{
+                senha
 
-            alert(
-                dados.erro ||
-                "Falha no login."
-            );
+            })
+
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+
+            alert(dados.erro);
+
+            return;
 
         }
 
-    }catch{
-
-        alert(
-            "Erro ao conectar ao servidor."
-        );
+        window.location.href = "dashboard.html";
 
     }
 
-}
+    catch (erro) {
+
+        console.log(erro);
+
+        alert("Erro ao conectar ao servidor.");
+
+    }
+
+});
