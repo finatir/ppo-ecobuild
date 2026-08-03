@@ -1,62 +1,71 @@
-const API = "http://localhost:3000";
+const cadastroForm = document.getElementById("cadastroForm");
+const mensagem = document.getElementById("mensagem");
 
-const form = document.getElementById("formCadastro");
+cadastroForm.addEventListener("submit", async (event) => {
 
-form.addEventListener("submit", async (e) => {
+    event.preventDefault();
 
-    e.preventDefault();
-
-    const nome = document.getElementById("nome").value;
-
-    const email = document.getElementById("email").value;
-
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
     const senha = document.getElementById("senha").value;
+
+    mensagem.textContent = "Criando conta...";
 
     try {
 
-        const resposta = await fetch(`${API}/auth/cadastro`, {
+        const resposta = await fetch(
+            `${API_URL}/auth/cadastro`,
+            {
+                method: "POST",
 
-            method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            credentials: "include",
+                credentials: "include",
 
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify({
-
-                nome,
-
-                email,
-
-                senha
-
-            })
-
-        });
+                body: JSON.stringify({
+                    nome,
+                    email,
+                    senha
+                })
+            }
+        );
 
         const dados = await resposta.json();
 
+        console.log("Resposta do servidor:", dados);
+
         if (!resposta.ok) {
 
-            alert(dados.erro);
+            mensagem.textContent =
+                dados.erro ||
+                "Erro ao criar conta.";
 
             return;
-
         }
 
-        alert("Cadastro realizado com sucesso!");
+        mensagem.textContent =
+            "Conta criada com sucesso!";
 
-        window.location.href = "login.html";
+        cadastroForm.reset();
 
-    }
+        setTimeout(() => {
 
-    catch (erro) {
+            window.location.href =
+                "login.html";
 
-        console.log(erro);
+        }, 1500);
+
+    } catch (erro) {
+
+        console.error(
+            "Erro de conexão:",
+            erro
+        );
+
+        mensagem.textContent =
+            "Erro ao conectar com o servidor.";
 
     }
 

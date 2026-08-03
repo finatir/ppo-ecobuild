@@ -1,102 +1,132 @@
-const API = "http://localhost:3000";
+const nomeUsuario =
+    document.getElementById(
+        "nomeUsuario"
+    );
 
-async function verificarLogin() {
+const totalProjetos =
+    document.getElementById(
+        "totalProjetos"
+    );
+
+const listaProjetos =
+    document.getElementById(
+        "listaProjetos"
+    );
+
+const logout =
+    document.getElementById(
+        "logout"
+    );
+
+
+// ========================================
+// CARREGAR USUÁRIO
+// ========================================
+
+async function carregarUsuario() {
 
     try {
 
-        const resposta = await fetch(
+        const resposta =
+            await fetch(
+                `${API_URL}/auth/me`,
+                {
+                    credentials:
+                        "include"
+                }
+            );
 
-            `${API}/auth/me`,
-
-            {
-
-                credentials: "include"
-
-            }
-
-        );
 
         if (!resposta.ok) {
 
-            window.location = "login.html";
+            window.location.href =
+                "login.html";
+
             return;
 
         }
 
-        const usuario = await resposta.json();
 
-        const nomeUsuario =
-            document.getElementById("nomeUsuario");
+        const usuario =
+            await resposta.json();
 
-        if (nomeUsuario) {
 
-            nomeUsuario.innerHTML =
-                usuario.nome;
+        nomeUsuario.textContent =
+            usuario.nome;
 
-        }
 
-    }
+    } catch (erro) {
 
-    catch (erro) {
+        console.error(
+            "Erro ao carregar usuário:",
+            erro
+        );
 
-        console.error(erro);
-
-        window.location = "login.html";
+        window.location.href =
+            "login.html";
 
     }
 
 }
+
+
+// ========================================
+// CARREGAR PROJETOS
+// ========================================
 
 async function carregarProjetos() {
 
     try {
 
-        const resposta = await fetch(
+        const resposta =
+            await fetch(
+                `${API_URL}/projetos`,
+                {
+                    credentials:
+                        "include"
+                }
+            );
 
-            `${API}/projetos`,
-
-            {
-
-                credentials: "include"
-
-            }
-
-        );
 
         if (!resposta.ok) {
 
-            throw new Error("Erro ao carregar projetos.");
+            throw new Error(
+                "Erro ao buscar projetos."
+            );
 
         }
 
-        const projetos = await resposta.json();
 
-        const total =
-            document.getElementById("totalProjetos");
+        const projetos =
+            await resposta.json();
 
-        if (total) {
 
-            total.innerHTML =
-                projetos.length;
+        totalProjetos.textContent =
+            projetos.length;
 
-        }
 
-        const lista =
-            document.getElementById("listaProjetos");
+        if (
+            projetos.length === 0
+        ) {
 
-        if (!lista) return;
+            listaProjetos.innerHTML = `
 
-        lista.innerHTML = "";
+                <div class="empty">
 
-        if (projetos.length === 0) {
+                    <h3>
+                        Nenhum projeto cadastrado
+                    </h3>
 
-            lista.innerHTML = `
+                    <p>
+                        Comece criando seu primeiro projeto.
+                    </p>
 
-                <div class="projeto-card">
-
-                    <h3>Nenhum projeto cadastrado.</h3>
-
-                    <p>Cadastre seu primeiro projeto.</p>
+                    <a
+                        href="projetos.html"
+                        class="button"
+                    >
+                        Criar projeto
+                    </a>
 
                 </div>
 
@@ -106,58 +136,131 @@ async function carregarProjetos() {
 
         }
 
-        projetos.forEach(projeto => {
 
-            lista.innerHTML += `
+        listaProjetos.innerHTML =
+            projetos
+                .slice(0, 5)
+                .map(
+                    projeto => `
 
-                <div class="projeto-card">
+                        <div
+                            class="projeto-card"
+                        >
 
-                    <h2>${projeto.nome_projeto}</h2>
+                            <div>
 
-                    <p><strong>Tijolo:</strong> ${projeto.tipo}</p>
+                                <h3>
+                                    ${
+                                        projeto.nome_projeto
+                                    }
+                                </h3>
 
-                    <p><strong>Área:</strong> ${projeto.area_parede} m²</p>
+                                <p>
+                                    Tijolo:
+                                    ${
+                                        projeto.tipo ||
+                                        "Não informado"
+                                    }
+                                </p>
 
-                    <p><strong>Junta:</strong> ${projeto.espessura_junta} cm</p>
+                            </div>
 
-                    <p><strong>Data:</strong> ${projeto.data_criacao}</p>
+                            <div>
 
-                </div>
+                                <strong>
+                                    ${
+                                        projeto.area_parede
+                                    }
+                                    m²
+                                </strong>
 
-            `;
+                            </div>
 
-        });
+                        </div>
 
-    }
+                    `
+                )
+                .join("");
 
-    catch (erro) {
 
-        console.error(erro);
+    } catch (erro) {
+
+        console.error(
+            "Erro:",
+            erro
+        );
+
+
+        listaProjetos.innerHTML = `
+
+            <div class="error">
+
+                Não foi possível carregar
+                seus projetos.
+
+            </div>
+
+        `;
 
     }
 
 }
 
-async function logout() {
 
-    await fetch(
+// ========================================
+// LOGOUT
+// ========================================
 
-        `${API}/auth/logout`,
+logout.addEventListener(
+    "click",
+    async (event) => {
 
-        {
+        event.preventDefault();
 
-            method: "POST",
 
-            credentials: "include"
+        try {
+
+            await fetch(
+                `${API_URL}/auth/logout`,
+                {
+
+                    method: "POST",
+
+                    credentials:
+                        "include"
+
+                }
+            );
+
+
+            window.location.href =
+                "login.html";
+
+
+        } catch (erro) {
+
+            console.error(
+                "Erro ao sair:",
+                erro
+            );
 
         }
 
-    );
+    }
+);
 
-    window.location = "login.html";
+
+// ========================================
+// INICIALIZAÇÃO
+// ========================================
+
+async function iniciarDashboard() {
+
+    await carregarUsuario();
+
+    await carregarProjetos();
 
 }
 
-verificarLogin();
 
-carregarProjetos();
+iniciarDashboard();

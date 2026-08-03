@@ -1,0 +1,241 @@
+async function carregarProjeto() {
+
+    if (!projetoId) {
+
+        projetoInfo.innerHTML = `
+
+            <div class="error">
+
+                <p>
+                    Nenhum projeto foi selecionado.
+                </p>
+
+                <br>
+
+                <a
+                    href="projetos.html"
+                    class="button"
+                >
+                    Voltar para projetos
+                </a>
+
+            </div>
+
+        `;
+
+        calculadoraForm.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    try {
+
+        const resposta =
+            await fetch(
+
+                `${API_URL}/projetos/${projetoId}`,
+
+                {
+
+                    method: "GET",
+
+                    credentials: "include"
+
+                }
+
+            );
+
+
+        // ========================================
+        // SESSÃO EXPIRADA
+        // ========================================
+
+        if (
+            resposta.status === 401
+        ) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        // ========================================
+        // PROJETO NÃO ENCONTRADO
+        // ========================================
+
+        if (
+            resposta.status === 404
+        ) {
+
+            throw new Error(
+                "Projeto não encontrado."
+            );
+
+        }
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro ao carregar projeto."
+            );
+
+        }
+
+
+        // ========================================
+        // RECEBER PROJETO
+        // ========================================
+
+        const projeto =
+            await resposta.json();
+
+
+        console.log(
+            "Projeto carregado:",
+            projeto
+        );
+
+
+        // ========================================
+        // MOSTRAR DADOS DO PROJETO
+        // ========================================
+
+        projetoInfo.innerHTML = `
+
+            <div>
+
+                <h3>
+                    ${projeto.nome_projeto}
+                </h3>
+
+                <p>
+
+                    <strong>
+                        Tipo:
+                    </strong>
+
+                    ${projeto.tipo}
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Dimensões:
+                    </strong>
+
+                    ${projeto.comprimento} ×
+                    ${projeto.largura} ×
+                    ${projeto.altura} cm
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Área da parede:
+                    </strong>
+
+                    ${projeto.area_parede}
+                    m²
+
+                </p>
+
+                <p>
+
+                    <strong>
+                        Espessura da junta:
+                    </strong>
+
+                    ${projeto.espessura_junta}
+                    cm
+
+                </p>
+
+            </div>
+
+        `;
+
+
+        // ========================================
+        // PREENCHER AUTOMATICAMENTE O FORMULÁRIO
+        // ========================================
+
+        document
+            .getElementById(
+                "area_total"
+            )
+            .value =
+                projeto.area_parede;
+
+
+        document
+            .getElementById(
+                "espessura_junta"
+            )
+            .value =
+                projeto.espessura_junta;
+
+
+        document
+            .getElementById(
+                "altura_tijolo"
+            )
+            .value =
+                projeto.altura;
+
+
+        document
+            .getElementById(
+                "comprimento_tijolo"
+            )
+            .value =
+                projeto.comprimento;
+
+
+        // ========================================
+        // CARREGAR HISTÓRICO
+        // ========================================
+
+        await carregarHistorico();
+
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar projeto:",
+            erro
+        );
+
+
+        projetoInfo.innerHTML = `
+
+            <div class="error">
+
+                <p>
+                    ${erro.message}
+                </p>
+
+                <br>
+
+                <a
+                    href="projetos.html"
+                    class="button"
+                >
+                    Voltar para projetos
+                </a>
+
+            </div>
+
+        `;
+
+    }
+
+}

@@ -1,58 +1,73 @@
-const API = "http://localhost:3000";
+const loginForm = document.getElementById("loginForm");
+const mensagem = document.getElementById("mensagem");
 
-const form = document.getElementById("formLogin");
+loginForm.addEventListener("submit", async (event) => {
 
-form.addEventListener("submit", async (e) => {
+    event.preventDefault();
 
-    e.preventDefault();
+    const email =
+        document.getElementById("email").value.trim();
 
-    const email = document.getElementById("email").value;
+    const senha =
+        document.getElementById("senha").value;
 
-    const senha = document.getElementById("senha").value;
+    mensagem.textContent = "Entrando...";
 
     try {
 
-        const resposta = await fetch(`${API}/auth/login`, {
+        const resposta = await fetch(
+            `${API_URL}/auth/login`,
+            {
+                method: "POST",
 
-            method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            credentials: "include",
+                credentials: "include",
 
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify({
-
-                email,
-
-                senha
-
-            })
-
-        });
+                body: JSON.stringify({
+                    email,
+                    senha
+                })
+            }
+        );
 
         const dados = await resposta.json();
 
+        console.log(
+            "Resposta do servidor:",
+            dados
+        );
+
         if (!resposta.ok) {
 
-            alert(dados.erro);
+            mensagem.textContent =
+                dados.erro ||
+                "Erro ao fazer login.";
 
             return;
-
         }
 
-        window.location.href = "dashboard.html";
+        mensagem.textContent =
+            "Login realizado com sucesso!";
 
-    }
+        setTimeout(() => {
 
-    catch (erro) {
+            window.location.href =
+                "dashboard.html";
 
-        console.log(erro);
+        }, 1000);
 
-        alert("Erro ao conectar ao servidor.");
+    } catch (erro) {
+
+        console.error(
+            "Erro de conexão:",
+            erro
+        );
+
+        mensagem.textContent =
+            "Erro ao conectar com o servidor.";
 
     }
 
